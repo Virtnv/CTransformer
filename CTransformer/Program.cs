@@ -20,38 +20,32 @@ namespace CTransformer
             string fileExtension = fileName.Substring(fileName.Length - 4);
             if(fileExtension != ".bin")
             {
-                Console.WriteLine("Uncorrect file format!");
+                Console.WriteLine("Incorrect file format!");
                 return 1;
             }
-
-            using (FileStream fStream = File.OpenRead(Directory.GetCurrentDirectory() + "fileName"))
+            byte[] b = new byte[640];
+            try
             {
-                if (fStream.Length < 640)
+                using (FileStream fStream = File.OpenRead(Directory.GetCurrentDirectory() + $"\\{fileName}"))
                 {
-                    Console.WriteLine("Too small file!");
-                    return 1;
+                    if (fStream.Length < 640)
+                    {
+                        Console.WriteLine("Too small file!");
+                        return 1;
+                    }
+                    fStream.Read(b, 0, b.Length);
+                    //ph = (PanelHeader)Serializer.RawDeserialize(b, 0, typeof(PanelHeader));
                 }
             }
-            //if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            //{
-            //    FileInfo fInfo = new FileInfo(openFileDialog1.FileName);
-            //    if (fInfo.Length < 640)
-            //    {
-            //        InfoBlock.Text += "\nFile size < 640 bytes!";
-            //    }
-            //    else
-            //    {
-            //        using (fStream = File.OpenRead(openFileDialog1.FileName))
-            //        {
-            //            //fStream.Read(b, 0, b.Length);
-                        
-                        //ph = (PanelHeader)Serializer.RawDeserialize(b, 0, typeof(PanelHeader));
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.Read();
+                return 1;
+            }
+            
 
-                 
-
-
-                //fileName.Substring(".bin");
-                Console.WriteLine("Everythiing OK!");
+            Console.WriteLine("Everythiing OK!");
             Console.ReadLine();
             return 0;
         }
