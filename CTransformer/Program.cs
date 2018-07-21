@@ -27,12 +27,16 @@ namespace CTransformer
                 {
                     try
                     {
-                        CommandLineParser.InputFileNameParse(args[0]); //TO DO: заебенить проверку на ввод хелпа!
+                        FileStream fs = CommandLineParser.InputFileNameParse(args[0]); //TO DO: заебенить проверку на ввод хелпа!
+                        if (args.Length > 1)
+                            CommandLineParser.KeyParser(args[1]);
+                        
 
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
 
+                        Console.WriteLine(ex.Message);
                         //throw;
                     }
 

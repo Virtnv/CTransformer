@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 namespace CTransformer
 {
@@ -7,18 +8,33 @@ namespace CTransformer
     {
         static public FileStream InputFileNameParse(string inputFileName)
         {
+
             string fileExt = Path.GetExtension(inputFileName);
-            if (fileExt.Length == 0)
+            string fileName = Path.GetFileName(inputFileName);
+
+            // check file extention length and file name length
+            if (fileExt.Length == 0 && fileName.Length != 0)
             {
                 fileExt = "bin";
+                inputFileName += "." + fileExt;
             }
-            else if (fileExt != "bin")
+            else if (fileExt != ".bin")
             {
-                Console.WriteLine("Incorrect file extension!");
-                return null;
-
+                throw new Exception("Incorrect file ext!");
             }
-            return null;
+            else if(fileName.Length == 0)
+            {
+                throw new Exception("Enter file name!");
+            }
+
+            // check if file exists
+            string fullPath = Path.GetFullPath(inputFileName);
+            if (!File.Exists(fullPath))
+            {
+                throw new Exception("Input File not found!");
+            }
+            FileStream fs = new FileStream(fullPath, FileMode.Open);
+            return fs;
         }
 
         public static string[] Splitter(string stringToSplit)
@@ -26,6 +42,23 @@ namespace CTransformer
             stringToSplit = stringToSplit.Trim();
             string []split = stringToSplit.Split(new Char[] { ' ', '\t' });
             return split;
+        }
+
+        public static void KeyParser(string key)
+        {
+            if (CheckManagedChar(key))
+            {
+                string option = key.Remove(0, 1);
+                option = 1.ToString();
+                Strategies.keys.Contains(option);
+
+            }
+        }
+
+        public static bool CheckManagedChar(string key)
+        {
+            if (key[0] == '-') return true;
+            throw new Exception("Incorrect key char");
         }
             //Console.WriteLine($"{File.Exists(inputFileName)}");
             //// Save all needed types
