@@ -42,8 +42,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BinFileObject.cs" />
     <Compile Include="CommandLineParser.cs" />
-    <Compile Include="Panel.cs" />
+    <Compile Include="BinFileHeader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serializer.cs" />
