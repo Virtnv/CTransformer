@@ -23,6 +23,7 @@ namespace CTransformer
                 {
                     fs.Read(headerByteArray, 0, headerSize);
                     binFileHeader = (BinFileHeader)Serializer.RawDeserialize(headerByteArray, 0, typeof(BinFileHeader));
+                    Console.WriteLine(binFileHeader.ToString());
                     measureCount = GetMeasureCount(binFileHeader);
                     int fileOffset = (2 * this.measureCount) + 6;
                     byte[] b = new byte[fileOffset];
@@ -31,7 +32,7 @@ namespace CTransformer
 
                     while (fs.Read(b, 0, b.Length) > 0)
                     {
-                        Console.WriteLine($"{ConvertByteArrayToDateTime(b)}\t{ConvertByteArrayToString(b)}");
+                        //Console.WriteLine($"{ConvertByteArrayToDateTime(b)}\t{ConvertByteArrayToString(b)}");
                         
                         //sb.AppendLine(BitConverter.ToString(b));
                     }

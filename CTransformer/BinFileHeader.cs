@@ -12,19 +12,19 @@ namespace CTransformer
     struct BinFileHeader
     {
         [FieldOffset(0)]
-        public double dt0;
+        public double dt0; // время установки
         [FieldOffset(8)]
-        public Int16 number;
+        public Int16 number; // номер панели
         [FieldOffset(10)]
-        public Int16 version;
+        public Int16 version; // версия прошивки
         [FieldOffset(12)]
-        public byte tick;
+        public byte tick;//время опроса static
         [FieldOffset(13)]
-        public byte wperi;
+        public byte wperi;//слов на измерение
         [FieldOffset(14)]
-        public Int16 offset;
+        public Int16 offset;//смещение в блоке
         [FieldOffset(16)]
-        public double dts;
+        public double dts;//время запуска
         [FieldOffset(24)]
         public byte onemr;
         [FieldOffset(25)]
@@ -61,6 +61,19 @@ namespace CTransformer
         [FieldOffset(564)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 76)]
         public byte[] reserved3;
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"Setup time:         {this.dt0.ToString()}");
+            sb.AppendLine($"Panel number:       {this.number.ToString()}");
+            sb.AppendLine($"Panel version:      {this.version.ToString()}");
+            sb.AppendLine($"Tick:               {this.tick.ToString()}");
+            sb.AppendLine($"Word per measure:   {this.wperi.ToString()}");
+            sb.AppendLine($"Block offset:       {this.offset.ToString()}");
+            sb.AppendLine($"Start time:         {this.dts.ToString()}");
+            return sb.ToString();
+        }
     }
 
     class PanelEvaluated
