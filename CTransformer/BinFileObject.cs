@@ -29,19 +29,68 @@ namespace CTransformer
                     fs.Seek(headerSize, SeekOrigin.Begin);
                     fs.Read(b, 0, b.Length);
 
-                    //while (fs.Read(b, 0, b.Length) > 0)
+                    while (fs.Read(b, 0, b.Length) > 0)
                     {
-                        sb.AppendLine(BitConverter.ToString(b));
+                        Console.WriteLine($"{ConvertByteArrayToDateTime(b)}\t{ConvertByteArrayToString(b)}");
+                        
+                        //sb.AppendLine(BitConverter.ToString(b));
                     }
 
-                    Console.WriteLine(sb);
                     fs.Close();
+
                 }
             }
             catch (Exception)
             {
                 throw new Exception("Pizda v constructore!");
             }
+        }
+
+        private static ushort ConvertDateTime(byte b, int millenium = 0)
+        // convert byte[] to date and time parts
+        {
+            return (ushort)(10 * (b / 16) + (b & 0x0f) + millenium);
+        }
+
+        public static DateTime ConvertByteArrayToDateTime(byte[] b)
+        {
+            string tempString = "";
+            for (int i = 0; i < 6; i++)
+            {
+                tempString += b[i].ToString();
+            }
+            
+            ushort seconds = ConvertDateTime(b[0]);
+            ushort minutes = ConvertDateTime(b[1]);
+            ushort hours = ConvertDateTime(b[2]);
+            ushort days = ConvertDateTime(b[3]);
+            ushort months = ConvertDateTime(b[4]);
+            ushort year = ConvertDateTime(b[5], 2000);
+            string dateTime = ($"{year.ToString()}/{months.ToString()}/{days.ToString()} {hours.ToString()}:{minutes.ToString()}:{seconds.ToString()}");
+
+            DateTime dt;
+            DateTime.TryParse(dateTime, out dt);
+            return dt;
+        }
+
+        public string ConvertByteArrayToString(byte[] b)
+        {
+            string resultString = "";
+            double dansr = 0f;
+            short value = 0;
+            float floatValue = 0f;
+            for (int i = 0; i < measureCount-1; i++)
+            {
+                if (this.binFileHeader.onemr == 1 && i == 0)
+                {
+                    dansr = 3.6 * (b[6] + 256 * b[7] - 133 * (~this.binFileHeader.reserved1)) / (this.binFileHeader.kemr * 60);
+                    resultString = $"{dansr.ToString()}\t";
+                }
+                value = (short)(b[6 + 2 * i] + 256 * b[7 + 2 * i]);
+                floatValue = value / 50f;
+                resultString += $"{floatValue.ToString()}\t";
+            }
+            return resultString;
         }
 
         public static ushort GetMeasureCount(BinFileHeader bfh)

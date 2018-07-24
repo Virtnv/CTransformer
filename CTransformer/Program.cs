@@ -29,11 +29,11 @@ namespace CTransformer
                     {
                         FileStream fs = CommandLineParser.InputFileNameParse(args[0]); //TO DO: заебенить проверку на ввод хелпа!
                         fs.Close();
-                        Console.WriteLine("File opened!");
                         BinFileObject fileObject = new BinFileObject(@args[0]);
                         //if (args.Length > 1)
                         //    CommandLineParser.KeyParser(args[1]);
-                        
+
+                        Console.WriteLine("File opened!");
 
                     }
                     catch (Exception ex)
