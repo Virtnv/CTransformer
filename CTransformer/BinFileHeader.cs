@@ -26,20 +26,20 @@ namespace CTransformer
         [FieldOffset(16)]
         public double dts;//время запуска
         [FieldOffset(24)]
-        public byte onemr;
+        public byte onemr;                                      //устьевой расходомер "1"-включен
         [FieldOffset(25)]
-        public byte reserved1;
+        public byte reserved1;                                  //резерв 1
         [FieldOffset(26)]
-        public Int16 kemr;
+        public Int16 kemr;                                      //коэффициент тарировки имп/литр
         [FieldOffset(28)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 100)]
         public byte[] reserved2;
         [FieldOffset(128)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
-        public byte[] ust;
+        public byte[] ust;                                      //настройки устьевой линии
         [FieldOffset(144)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
-        public byte[] osn;
+        public byte[] osn;                                      //настройки основной линии
         [FieldOffset(160)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
         public byte[] dop;
@@ -72,7 +72,26 @@ namespace CTransformer
             sb.AppendLine($"Word per measure:   {this.wperi.ToString()}");
             sb.AppendLine($"Block offset:       {this.offset.ToString()}");
             sb.AppendLine($"Start time:         {this.dts.ToString()}");
+            sb.AppendLine($"Ust line options:   {LineOptionsToString(this.ust)}");
+            sb.AppendLine($"Osn line options:   {LineOptionsToString(this.osn)}");
+            sb.AppendLine($"Dop line options:   {LineOptionsToString(this.dop)}");
             return sb.ToString();
+        }
+
+        private string LineOptionsToString(byte[] b) // разбирает настройки линии в строку вида 1 2 3t 4r 0 0 0 0 0 0
+        {
+            string result = null;
+            for (int i = 0; i < b.Length; i++)
+            {
+                result += $"{(b[i] & 0x0F).ToString()}";
+                if ((b[i] & 0x10) == 0x10)
+                    result += "t ";
+                else if ((b[i] & 0x20) == 0x20)
+                    result += "r ";
+                else
+                    result += " ";
+            }
+            return result;
         }
     }
 
@@ -90,9 +109,11 @@ namespace CTransformer
                 if ((ph.ust[i] & 0x0f) != 0) measureCount++;
                 if ((ph.ust[i] & 0x10) != 0) measureCount++;
                 if ((ph.osn[i] & 0x0f) != 0) measureCount++;
-                if ((ph.osn[i] & 0x10) != 0) measureCount++;
+                if ((ph.osn[i] & 0x10) == 0x10) measureCount++;
+                //if ((ph.osn[i] & 0x20) == 0x20) measureCount++;
                 if ((ph.dop[i] & 0x0f) != 0) measureCount++;
-                if ((ph.dop[i] & 0x10) != 0) measureCount++;
+                if ((ph.dop[i] & 0x10) == 0x10) measureCount++;
+                //if ((ph.dop[i] & 0x20) == 0x20) measureCount++;
             }
             return measureCount;
         }

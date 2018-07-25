@@ -100,14 +100,17 @@ namespace CTransformer
             if (bfh.onemr == 1) temp++;
             for (int i = 0; i < 16; i++)
             {
-                if ((bfh.ust[i] & 0x0f) != 0) temp++;
+                if ((bfh.ust[i] & 0x0f) != 0) temp++; //TO DO: сделай функцию ЕБА!!!
                 if ((bfh.ust[i] & 0x10) != 0) temp++;
                 if ((bfh.osn[i] & 0x0f) != 0) temp++;
                 if ((bfh.osn[i] & 0x10) != 0) temp++;
+                if ((bfh.osn[i] & 0x20) != 0) temp++;
                 if ((bfh.dop[i] & 0x0f) != 0) temp++;
                 if ((bfh.dop[i] & 0x10) != 0) temp++;
+                if ((bfh.dop[i] & 0x20) != 0) temp++;
             }
             return temp;
         }
+        
     }
 }
