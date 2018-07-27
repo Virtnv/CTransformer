@@ -65,16 +65,30 @@ namespace CTransformer
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"Setup time:         {this.dt0.ToString()}");
+            sb.AppendLine($"Setup time:         {this.dt0.ToString()}\n\t\t\t{BinFileObject.ConvertByteArrayToDateTime(BitConverter.GetBytes(dt0))}");
             sb.AppendLine($"Panel number:       {this.number.ToString()}");
             sb.AppendLine($"Panel version:      {this.version.ToString()}");
             sb.AppendLine($"Tick:               {this.tick.ToString()}");
             sb.AppendLine($"Word per measure:   {this.wperi.ToString()}");
             sb.AppendLine($"Block offset:       {this.offset.ToString()}");
-            sb.AppendLine($"Start time:         {this.dts.ToString()}");
+            sb.AppendLine($"Start time:         {this.dts.ToString()}\n\t\t\t{BinFileObject.ConvertByteArrayToDateTime(BitConverter.GetBytes(dts))}");
+            sb.AppendLine($"Ust flow:           {this.onemr.ToString()}");
+            sb.AppendLine($"Reserved 1:         {this.reserved1.ToString()}");
+            sb.AppendLine($"Kemr:               {this.kemr.ToString()}");
+            //sb.AppendLine($"Reserved 2:         {LineOptionsToString(this.reserved2, 16)}");
             sb.AppendLine($"Ust line options:   {LineOptionsToString(this.ust)}");
             sb.AppendLine($"Osn line options:   {LineOptionsToString(this.osn)}");
             sb.AppendLine($"Dop line options:   {LineOptionsToString(this.dop)}");
+
+            sb.AppendLine($"Adrmdp:             {this.adrmdp.ToString()}");
+            sb.AppendLine($"Spmdp:              {this.spmdp.ToString()}");
+            sb.AppendLine($"Reserved 4:         {this.reserved4.ToString()}");
+    
+            //sb.AppendLine($"Ust Description:    {Encoder(this.ustLineDescription)}");
+            //sb.AppendLine($"Osn Description:    {Encoder(this.osnLineDescription)}");
+            //sb.AppendLine($"Dop Description:    {Encoder(this.dopLineDescription)}");
+            //sb.AppendLine($"Reserved 3:         {Encoder(this.reserved3)}");
+
             return sb.ToString();
         }
 
@@ -92,6 +106,28 @@ namespace CTransformer
                     result += " ";
             }
             return result;
+        }
+        private string LineOptionsToString(byte[] b, short blockSize)
+        {
+            string result = null;
+            int i = 0;
+            foreach (var item in b)
+            {
+                result += $"{Convert.ToString(item)} ";
+                if (i++ == blockSize)
+                {
+                    result += "\n";
+                    i = 0;
+                }
+            }
+            return result + "\n";
+        }
+
+        private string Encoder(byte[] b)
+        {
+            return BitConverter.ToString(b);
+            //var encoder = System.Text.Encoding.GetEncoding(437);
+            //return encoder.GetString(b);
         }
     }
 
