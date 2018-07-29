@@ -18,38 +18,43 @@ namespace CTransformer
 
             while ((line = Console.ReadLine()) != quitChar.ToString())
             {
-                if (args == null)
-                {
-                    args = CommandLineParser.Splitter(line);
-                    //TO DO: сплиттер должен убирать из строки повторяющиеся пробелы и табуляцию
-                }
-                if (args.Length > 0)
-                {
-                    try
-                    {
-                        FileStream fs = CommandLineParser.InputFileNameParse(args[0]); //TO DO: заебенить проверку на ввод хелпа!
-                        fs.Close();
-                        BinFileObject fileObject = new BinFileObject(@args[0]);
-                        //if (args.Length > 1)
-                        //    CommandLineParser.KeyParser(args[1]);
+                string path = @"c:\bin\2.bin";
+                BinFileObject bfo = new BinFileObject(path);
+                Console.WriteLine($"File {path} opened.");
+                BinFileObject.Save(@"c:\\bin\\2.txt", bfo);
 
-                        Console.WriteLine("File opened!");
+                //if (args == null)
+                //{
+                //    args = CommandLineParser.Splitter(line);
+                //    //TO DO: сплиттер должен убирать из строки повторяющиеся пробелы и табуляцию
+                //}
+                //if (args.Length > 0)
+                //{
+                //    try
+                //    {
+                //        FileStream fs = CommandLineParser.InputFileNameParse(args[0]); //TO DO: заебенить проверку на ввод хелпа!
+                //        fs.Close();
+                //        BinFileObject fileObject = new BinFileObject(@args[0]);
+                //        //if (args.Length > 1)
+                //        //    CommandLineParser.KeyParser(args[1]);
 
-                    }
-                    catch (Exception ex)
-                    {
+                //        Console.WriteLine("File opened!");
 
-                        Console.WriteLine(ex.Message);
-                        //throw;
-                    }
+                //    }
+                //    catch (Exception ex)
+                //    {
 
-                }
-                else
-                {
-                    Console.WriteLine("Enter the parameters!");
-                }
-                //Console.WriteLine(args[0]);
-                args = null;
+                //        Console.WriteLine(ex.Message);
+                //        //throw;
+                //    }
+
+                //}
+                //else
+                //{
+                //    Console.WriteLine("Enter the parameters!");
+                //}
+                ////Console.WriteLine(args[0]);
+                //args = null;
             }
 
             //if (args.Length == 0)
@@ -86,8 +91,6 @@ namespace CTransformer
             //    return 1;
             //}
 
-
-            Console.WriteLine("Everything OK!");
             Console.ReadLine();
             return 0;
         }

@@ -17,16 +17,17 @@ namespace CTransformer
             char[] whitespace = new char[] { ' ', '\t', '\n'};
             string[] splittedDataString = dataString.Split(whitespace);
             isDateValid = DateTime.TryParse($"{splittedDataString[0]} {splittedDataString[1]}", out dt);
-            data = new float[splittedDataString.Length];
-            for (int i = 2; i < splittedDataString.Length; i++)
+            data = new float[splittedDataString.Length - 3];
+            for (int i = 2; i < splittedDataString.Length - 1; i++)
             {
                 float.TryParse(splittedDataString[i], out data[i - 2]);
             }
         }
 
+
         public override string ToString()
         {
-            return $"Dt.: {dt.ToString("G")} St.: {isDateValid.ToString()} {String.Join("\t", data)}";// data.ToString()}";
+            return $"{dt.ToString("G")}\t{String.Join("\t", data)}";//{String.Join("\t", data)}";
         }
 
 

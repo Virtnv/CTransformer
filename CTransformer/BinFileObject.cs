@@ -4,19 +4,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace CTransformer
 {
     class BinFileObject
     {
-        private const int headerSize = 640;
+        //private const int headerSize = 640;
+        //private byte[] headerByteArray = new byte[headerSize];
+
+        private readonly int headerSize; // размер заголовка bin файла
         private readonly ushort measureCount;
-        private byte[] headerByteArray = new byte[headerSize];
+        private byte[] headerByteArray; // заголовок файла массив байт !!!!!! Equals!!!!!
 
-        public BinFileHeader binFileHeader;
-        public List<DataEntry> dataEntryList;
+        public BinFileHeader binFileHeader; // заголовок файла Структура
+        public List<DataEntry> dataEntryList; // список Записей(дата...массив данных)
 
-        private StringBuilder sb = new StringBuilder();
+        //private StringBuilder sb = new StringBuilder(); 
 
         public BinFileObject(string pathToBinFile)
         {
@@ -24,11 +28,15 @@ namespace CTransformer
             {
                 using (FileStream fs = File.Open(pathToBinFile, FileMode.Open, FileAccess.Read, FileShare.None))
                 {
+                    headerSize = Marshal.SizeOf(typeof(BinFileHeader));
+                    headerByteArray = new byte[headerSize];
+
                     fs.Read(headerByteArray, 0, headerSize);
                     binFileHeader = (BinFileHeader)Serializer.RawDeserialize(headerByteArray, 0, typeof(BinFileHeader));
                     dataEntryList = new List<DataEntry>();
-                    Console.WriteLine(binFileHeader.ToString());
+                    //Console.WriteLine(binFileHeader.ToString());
                     measureCount = GetMeasureCount(binFileHeader);
+
                     int fileOffset = (2 * this.measureCount) + 6;
                     byte[] b = new byte[fileOffset];
                     fs.Seek(headerSize, SeekOrigin.Begin);
@@ -38,19 +46,21 @@ namespace CTransformer
                     while (fs.Read(b, 0, b.Length) > 0)
                     {
                         ConvertByteArrayToDateTime(b, out dateString);
+
+                        //dataEntryList.Add(new DataEntry($"{dateString} {ConvertByteArrayToString(b)}"));
                         dataEntryList.Add(new DataEntry($"{dateString} {ConvertByteArrayToString(b)}"));
-                        
-                        
+
+
                         //sb.AppendLine(BitConverter.ToString(b));
                         //if (z++ > 10) break;
                     }
-                    DateTime dt1 = new DateTime(2018,07,26);
-                    var sel = from c in dataEntryList where c.dt > dt1 select c;
-                    foreach (var item in sel)
-                    {
-                        Console.WriteLine($"{item.dt}\t{item.data[1]}\t{item.data[3]} ");
-                    }
-                    Console.WriteLine(this.dataEntryList[1].ToString());
+                    //DateTime dt1 = new DateTime(2018,07,26);
+                    //var sel = from c in dataEntryList where c.dt > dt1 select c;
+                    //foreach (var item in sel)
+                    //{
+                    //    Console.WriteLine($"{item.dt}\t{item.data[1]}\t{item.data[3]} ");
+                    //}
+                    //Console.WriteLine(this.dataEntryList[1].ToString());
                     fs.Close();
 
                 }
@@ -115,14 +125,21 @@ namespace CTransformer
             double dansr = 0f;
             short value = 0;
             float floatValue = 0f;
-            for (int i = 0; i < measureCount-1; i++)
+            var koeff1 = 133 * (~this.binFileHeader.reserved1);
+            var koeff2 = (this.binFileHeader.kemr * 60);
+            
+            for (int i = 0, z = 0; i < measureCount-1; i++)
             {
                 if (this.binFileHeader.onemr == 1 && i == 0)
                 {
-                    dansr = 3.6 * (b[6] + 256 * b[7] - 133 * (~this.binFileHeader.reserved1)) / (this.binFileHeader.kemr * 60);
+                    //dansr = 3.6 * (b[6] + 256 * b[7] - 133 * (~this.binFileHeader.reserved1)) / (this.binFileHeader.kemr * 60);
+                    dansr = 3.6 * (b[6] + 256 * b[7] - koeff1) / koeff2;
                     resultString = $"{dansr.ToString()}\t";
                 }
-                value = (short)(b[6 + 2 * i] + 256 * b[7 + 2 * i]);
+                z = 6 + 2 * i;
+                //value = (short)(b[6 + 2 * i] + 256 * b[7 + 2 * i]);
+                value = (short)(b[z] + 256 * b[z + 1]);
+
                 floatValue = value / 50f;
                 resultString += $"{floatValue.ToString()}\t";
             }
@@ -158,12 +175,29 @@ namespace CTransformer
                 if ((bfh.ust[i] & 0x10) != 0) temp++;
                 if ((bfh.osn[i] & 0x0f) != 0) temp++;
                 if ((bfh.osn[i] & 0x10) != 0) temp++;
-                //if ((bfh.osn[i] & 0x20) != 0) temp++;
                 if ((bfh.dop[i] & 0x0f) != 0) temp++;
                 if ((bfh.dop[i] & 0x10) != 0) temp++;
-                //if ((bfh.dop[i] & 0x20) != 0) temp++;
             }
             return temp;
+        }
+
+        public static void Save(string fileName, BinFileObject bfo)
+        {
+            try
+            {
+                using (StreamWriter writer = File.CreateText(fileName))
+                {
+                    foreach (var item in bfo.dataEntryList)
+                    {
+                        writer.WriteLine($"{item.ToString()}");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
         
     }
